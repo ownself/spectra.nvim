@@ -30,7 +30,7 @@ Lazy.nvim example:
 
 ```lua
 {
-  dir = "D:/Temp/ColorScheme/spectra.nvim",
+  dir = "ownself/spectra.nvim",
   name = "spectra.nvim",
   priority = 1000,
   config = function()
