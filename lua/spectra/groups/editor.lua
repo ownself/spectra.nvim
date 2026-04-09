@@ -5,6 +5,9 @@ local M = {}
 function M.get(C, R, O)
   local transparent = O.transparent_background
   local normal_bg = transparent and C.none or C.bg
+  local line_nr = C.line_nr or C.subtle
+  local cursorline_nr = C.cursorline_nr or C.pink
+  local match_paren_bg = C.match_paren_bg or U.blend(C.border, C.bg, 0.55)
 
   return {
     Normal = { fg = C.fg, bg = normal_bg },
@@ -13,7 +16,7 @@ function M.get(C, R, O)
     ColorColumn = { bg = C.bg_dark },
     CursorColumn = { bg = C.bg_cursorline },
     CursorLine = { bg = C.bg_cursorline },
-    CursorLineNr = { fg = C.pink, bold = true },
+    CursorLineNr = { fg = cursorline_nr, bold = true },
     CursorLineFold = { fg = C.subtle },
     CursorLineSign = { fg = C.subtle },
     Directory = { fg = C.cyan, bold = true },
@@ -23,8 +26,8 @@ function M.get(C, R, O)
     IncSearch = { fg = C.bg, bg = C.orange, bold = true },
     Search = { fg = C.fg, bg = U.blend(C.purple, C.bg, 0.35) },
     CurSearch = { link = "IncSearch" },
-    LineNr = { fg = "#A3A5BA" },
-    MatchParen = { fg = C.fg, bg = "#747A9D", bold = true },
+    LineNr = { fg = line_nr },
+    MatchParen = { fg = C.fg, bg = match_paren_bg, bold = true },
     NonText = { fg = C.subtle },
     Pmenu = { fg = C.fg, bg = C.bg_float },
     PmenuMatch = { fg = C.cyan, bg = C.bg_float, bold = true },

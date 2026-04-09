@@ -1,6 +1,11 @@
 local M = {}
 
 local builtin_themes = {
+  ["catppuccin"] = "spectra.themes.catppuccin_macchiato",
+  ["catppuccin-frappe"] = "spectra.themes.catppuccin_frappe",
+  ["catppuccin-latte"] = "spectra.themes.catppuccin_latte",
+  ["catppuccin-macchiato"] = "spectra.themes.catppuccin_macchiato",
+  ["catppuccin-mocha"] = "spectra.themes.catppuccin_mocha",
   ["dracula-colorful"] = "spectra.themes.dracula_colorful",
 }
 

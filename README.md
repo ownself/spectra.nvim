@@ -2,7 +2,7 @@
 
 A Neovim 0.12+ semantic colorscheme engine with first-class TreeSitter and LSP support.
 
-The first built-in theme is `dracula-colorful`, migrated from the earlier standalone `dracula-colorful.nvim` implementation.
+The built-in themes currently include `dracula-colorful` plus four Catppuccin flavours: `catppuccin-mocha`, `catppuccin-macchiato`, `catppuccin-frappe`, and `catppuccin-latte`.
 
 ## Goals
 
@@ -13,11 +13,12 @@ The first built-in theme is `dracula-colorful`, migrated from the earlier standa
 
 ## First-Phase Scope
 
-The initial `spectra.nvim` phase delivers:
+The current `spectra.nvim` phase delivers:
 
 - a shared engine runtime under `lua/spectra/`
 - a built-in theme registry
 - `dracula-colorful` as the first built-in theme
+- `catppuccin-mocha`, `catppuccin-macchiato`, `catppuccin-frappe`, and `catppuccin-latte` as a second built-in theme family
 - shared `after/queries` language refinements
 - shared editor, syntax, TreeSitter, LSP, semantic token, and integration modules
 - migrated fixtures and headless validation helpers
@@ -33,14 +34,14 @@ Lazy.nvim example:
   priority = 1000,
   config = function()
     require("spectra").setup({
-      theme = "dracula-colorful",
+      theme = "catppuccin-mocha",
       transparent_background = false,
       styles = {
         comments = { "italic" },
         parameters = { "italic" },
       },
     })
-    vim.cmd.colorscheme("dracula-colorful")
+    vim.cmd.colorscheme("catppuccin-mocha")
   end,
 }
 ```
@@ -65,6 +66,11 @@ Each built-in theme is expected to provide:
 
 The engine owns the shared highlighting runtime. Themes primarily describe color intent rather than reimplementing the whole stack.
 
+For a step-by-step guide to adding a new built-in theme, see [docs/adding-a-theme.md](./docs/adding-a-theme.md).
+中文版本见 [docs/adding-a-theme.zh-CN.md](./docs/adding-a-theme.zh-CN.md)。
+Catppuccin family compatibility notes are documented in [docs/catppuccin-compat.md](./docs/catppuccin-compat.md)。
+中文版本见 [docs/catppuccin-compat.zh-CN.md](./docs/catppuccin-compat.zh-CN.md)。
+
 ## Fallback Order
 
 Highlight resolution follows this order:
@@ -88,6 +94,29 @@ Intentional departures from `dracula.vim` remain:
 - fields and properties are orange
 - classes, interfaces, and namespaces are cyan
 - constants and static symbols are purple
+
+## Built-in Theme Family: Catppuccin
+
+The following Catppuccin flavours are available:
+
+- `catppuccin-mocha`
+- `catppuccin-macchiato`
+- `catppuccin-frappe`
+- `catppuccin-latte`
+
+These flavours reuse the shared `spectra` runtime while importing the original Catppuccin flavour palettes and family-level semantic intent.
+
+Example:
+
+```lua
+require("spectra").setup({
+  theme = "catppuccin-latte",
+})
+vim.cmd.colorscheme("catppuccin-latte")
+```
+
+For differences from the source `catppuccin.nvim` plugin, see [docs/catppuccin-compat.md](./docs/catppuccin-compat.md).
+中文说明见 [docs/catppuccin-compat.zh-CN.md](./docs/catppuccin-compat.zh-CN.md)。
 
 ## Known Fidelity Gaps
 
