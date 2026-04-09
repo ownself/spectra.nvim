@@ -1,26 +1,110 @@
 local M = {}
 
-local builtin_themes = {
-  ["catppuccin"] = "spectra.themes.catppuccin_macchiato",
-  ["catppuccin-frappe"] = "spectra.themes.catppuccin_frappe",
-  ["catppuccin-latte"] = "spectra.themes.catppuccin_latte",
-  ["catppuccin-macchiato"] = "spectra.themes.catppuccin_macchiato",
-  ["catppuccin-mocha"] = "spectra.themes.catppuccin_mocha",
-  ["dracula-colorful"] = "spectra.themes.dracula_colorful",
+local registry = {
+  themes = {
+    ["dracula-colorful"] = {
+      module = "spectra.themes.dracula_colorful",
+    },
+    ["catppuccin-mocha"] = {
+      module = "spectra.themes.catppuccin_mocha",
+      family = "catppuccin",
+      flavour = "mocha",
+    },
+    ["catppuccin-macchiato"] = {
+      module = "spectra.themes.catppuccin_macchiato",
+      family = "catppuccin",
+      flavour = "macchiato",
+    },
+    ["catppuccin-frappe"] = {
+      module = "spectra.themes.catppuccin_frappe",
+      family = "catppuccin",
+      flavour = "frappe",
+    },
+    ["catppuccin-latte"] = {
+      module = "spectra.themes.catppuccin_latte",
+      family = "catppuccin",
+      flavour = "latte",
+    },
+  },
+  families = {
+    catppuccin = {
+      default = "catppuccin-macchiato",
+      flavours = {
+        "catppuccin-mocha",
+        "catppuccin-macchiato",
+        "catppuccin-frappe",
+        "catppuccin-latte",
+      },
+    },
+  },
+  aliases = {
+  },
 }
 
-function M.get(name)
-  local module_name = builtin_themes[name]
+local function get_theme_record(name)
+  return registry.themes[name]
+end
 
-  if not module_name then
+function M.resolve(name)
+  local requested = name
+  local family = registry.families[name]
+  local canonical = family and family.default or registry.aliases[name] or name
+  local theme = get_theme_record(canonical)
+
+  if not theme then
     error("spectra.nvim: unknown theme '" .. tostring(name) .. "'")
   end
 
-  return require(module_name)
+  local resolved_family = theme.family and registry.families[theme.family] or nil
+
+  return {
+    requested = requested,
+    canonical = canonical,
+    theme = vim.deepcopy(theme),
+    family = resolved_family and vim.deepcopy(resolved_family) or nil,
+    is_alias = requested ~= canonical,
+  }
+end
+
+function M.get(name)
+  local resolved = M.resolve(name)
+  return require(resolved.theme.module)
 end
 
 function M.list()
-  return vim.tbl_keys(builtin_themes)
+  local names = {}
+
+  for name in pairs(registry.themes) do
+    table.insert(names, name)
+  end
+
+  for name in pairs(registry.aliases) do
+    table.insert(names, name)
+  end
+
+  for name in pairs(registry.families) do
+    table.insert(names, name)
+  end
+
+  table.sort(names)
+  return names
+end
+
+function M.list_themes()
+  local names = vim.tbl_keys(registry.themes)
+  table.sort(names)
+  return names
+end
+
+function M.list_families()
+  local names = vim.tbl_keys(registry.families)
+  table.sort(names)
+  return names
+end
+
+function M.get_family(name)
+  local family = registry.families[name]
+  return family and vim.deepcopy(family) or nil
 end
 
 return M

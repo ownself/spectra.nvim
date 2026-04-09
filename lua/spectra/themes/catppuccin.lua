@@ -196,18 +196,34 @@ local function roles(C, O)
     text = { fg = C.text },
     identifier = { fg = C.flamingo },
     local_variable = { fg = C.text },
+    builtin_variable = { fg = C.red },
     comment = { fg = C.overlay1, italic = vim.tbl_contains(styles.comments or {}, "italic") },
     keyword = { fg = C.mauve },
+    preproc = { fg = C.mauve },
     function_name = { fg = C.blue },
+    function_builtin = { fg = C.peach },
     type = { fg = C.yellow },
+    builtin_type = { fg = C.mauve },
+    type_parameter = { fg = C.mauve },
+    constructor = { fg = C.yellow },
     parameter = { fg = C.maroon, italic = vim.tbl_contains(styles.parameters or {}, "italic") },
+    label = { fg = C.overlay1 },
     field = { fg = C.lavender },
     property = { fg = C.lavender },
     constant = { fg = C.peach },
+    macro = { fg = C.pink },
     string = { fg = C.green },
+    character = { fg = C.teal },
+    number = { fg = C.peach },
     escape = { fg = C.pink },
+    regexp = { fg = C.pink },
+    special = { fg = C.pink },
+    tag = { fg = C.blue },
+    attribute = { fg = C.yellow },
     operator = { fg = C.sky },
     module = { fg = C.yellow },
+    uri = { fg = C.blue, underline = true },
+    todo = { fg = C.base, bg = C.flamingo, bold = true },
     diagnostic_error = { fg = C.red },
     diagnostic_warn = { fg = C.yellow },
     diagnostic_info = { fg = C.sky },
@@ -322,18 +338,22 @@ end
 
 local function shared_overrides(C)
   return {
-    editor = function()
-      return editor_overrides(C)
-    end,
-    syntax = function()
-      return syntax_overrides(C)
-    end,
-    treesitter = function()
-      return treesitter_overrides(C)
-    end,
-    semantic_tokens = function()
-      return semantic_token_overrides(C)
-    end,
+    modules = {
+      editor = function()
+        return editor_overrides(C)
+      end,
+      syntax = function()
+        return syntax_overrides(C)
+      end,
+      treesitter = function()
+        return treesitter_overrides(C)
+      end,
+      semantic_tokens = function()
+        return semantic_token_overrides(C)
+      end,
+    },
+    integrations = {},
+    languages = {},
   }
 end
 

@@ -41,11 +41,19 @@ lua/spectra/themes/gruvbox_soft.lua
 Example:
 
 ```lua
-local builtin_themes = {
-  ["dracula-colorful"] = "spectra.themes.dracula_colorful",
-  ["gruvbox-soft"] = "spectra.themes.gruvbox_soft",
+local registry = {
+  themes = {
+    ["dracula-colorful"] = {
+      module = "spectra.themes.dracula_colorful",
+    },
+    ["gruvbox-soft"] = {
+      module = "spectra.themes.gruvbox_soft",
+    },
+  },
 }
 ```
+
+If the theme belongs to a family, register the canonical theme in `themes` and the family default in `families` instead of duplicating flat entries.
 
 3. If you want users to load it directly with `:colorscheme <name>`, add a matching file under:
 
@@ -87,8 +95,6 @@ function M.palette()
     fg_parameter = "#D0B0FF",
     comment = "#7FA0C8",
     subtle = "#7A7A7A",
-    gutter = "#202020",
-    guide = "#303030",
     cyan = "#7DD3FC",
     green = "#86EFAC",
     orange = "#FDBA74",
@@ -99,6 +105,8 @@ function M.palette()
     yellow = "#FDE68A",
     sky = "#93C5FD",
     teal = "#5EEAD4",
+    gutter = "#202020",
+    guide = "#303030",
     border = "#505050",
     braces = "#93C5FD",
     brackets = "#86EFAC",
@@ -139,18 +147,34 @@ function M.roles(C, O)
     text = { fg = C.fg },
     identifier = { fg = C.fg_muted },
     local_variable = { fg = C.fg_muted },
+    builtin_variable = { fg = "#C4B5FD" },
     comment = { fg = C.comment, italic = vim.tbl_contains(styles.comments or {}, "italic") },
     keyword = { fg = C.pink },
+    preproc = { fg = C.pink },
     function_name = { fg = C.green },
+    function_builtin = { fg = C.cyan },
     type = { fg = C.cyan },
+    builtin_type = { fg = C.cyan },
+    type_parameter = { fg = "#C4B5FD" },
+    constructor = { fg = C.cyan },
     parameter = { fg = C.fg_parameter, italic = vim.tbl_contains(styles.parameters or {}, "italic") },
+    label = { fg = C.subtle },
     field = { fg = C.orange },
     property = { fg = C.amber },
     constant = { fg = C.purple, bold = true },
+    macro = { fg = C.purple },
     string = { fg = C.yellow },
+    character = { fg = C.yellow },
+    number = { fg = C.purple },
     escape = { fg = C.orange },
+    regexp = { fg = C.pink },
+    special = { fg = C.orange },
+    tag = { fg = C.pink },
+    attribute = { fg = C.green },
     operator = { fg = C.pink },
     module = { fg = C.cyan },
+    uri = { fg = C.cyan, underline = true },
+    todo = { fg = C.bg, bg = C.pink, bold = true },
     diagnostic_error = { fg = C.red },
     diagnostic_warn = { fg = C.orange },
     diagnostic_info = { fg = C.cyan },
@@ -167,7 +191,11 @@ M.meta = {
   background = "dark",
 }
 
-M.overrides = {}
+M.overrides = {
+  modules = {},
+  integrations = {},
+  languages = {},
+}
 
 return M
 ```
@@ -198,16 +226,15 @@ M.meta = {
 
 `palette()` returns the raw color slots consumed by the shared runtime.
 
-At the moment, shared modules expect a stable set of keys such as:
+The shared runtime now prefers semantic roles first. The stable palette contract is intentionally narrower and mainly covers low-level UI and delimiter needs:
 
 - backgrounds: `bg`, `bg_dark`, `bg_darker`, `bg_float`, `bg_cursorline`, `bg_selection`
 - foregrounds: `fg`, `fg_muted`, `fg_parameter`
-- accents: `comment`, `cyan`, `green`, `orange`, `amber`, `pink`, `purple`, `red`, `yellow`, `sky`, `teal`
 - UI support: `subtle`, `gutter`, `guide`, `border`
 - delimiter colors: `braces`, `brackets`, `parens`, `rainbow`
 - special values: `none`, `terminal`
 
-If a required slot is missing, shared highlight modules may fail or produce incomplete groups.
+Extra palette keys are still allowed, but new shared modules should avoid depending on them when the same decision can be expressed through `roles()`.
 
 ## `roles(C, O)`
 
@@ -227,18 +254,34 @@ Recommended base roles:
 - `text`
 - `identifier`
 - `local_variable`
+- `builtin_variable`
 - `comment`
 - `keyword`
+- `preproc`
 - `function_name`
+- `function_builtin`
 - `type`
+- `builtin_type`
+- `type_parameter`
+- `constructor`
 - `parameter`
+- `label`
 - `field`
 - `property`
 - `constant`
+- `macro`
 - `string`
+- `character`
+- `number`
 - `escape`
+- `regexp`
+- `special`
+- `tag`
+- `attribute`
 - `operator`
 - `module`
+- `uri`
+- `todo`
 - `diagnostic_error`
 - `diagnostic_warn`
 - `diagnostic_info`
@@ -251,7 +294,14 @@ Recommended base roles:
 
 `overrides` is optional. Use it only when the shared runtime is not enough.
 
-Supported keys currently match the shared module names:
+Supported keys are now separated by scope:
+
+- `modules`
+- `integrations`
+- `languages`
+- `all`
+
+`modules` accepts the shared module names:
 
 - `editor`
 - `syntax`
@@ -259,9 +309,8 @@ Supported keys currently match the shared module names:
 - `lsp`
 - `semantic_tokens`
 - `integrations`
-- `all`
 
-Each override is a function:
+Each provider can be a function:
 
 ```lua
 function(C, R, O)
@@ -275,13 +324,24 @@ Example:
 
 ```lua
 M.overrides = {
-  editor = function(C)
-    return {
-      FloatTitle = { fg = C.orange, bold = true },
-    }
-  end,
+  modules = {
+    editor = function(C)
+      return {
+        FloatTitle = { fg = C.orange, bold = true },
+      }
+    end,
+  },
+  integrations = {
+    cmp = function(C)
+      return {
+        CmpItemKindFunction = { fg = C.orange, bold = true },
+      }
+    end,
+  },
 }
 ```
+
+`languages` is reserved for future language-category overrides. The current runtime normalizes and carries it forward so theme files do not need another shape change later, but the first pass does not add a heavy language override DSL.
 
 Use overrides sparingly. If a color decision belongs to a semantic role, prefer changing `roles()` instead.
 
@@ -324,6 +384,11 @@ nvim --headless -u tests/minimal_init.lua "+colorscheme <theme-name>" "+qa"
 ```
 
 8. Inspect target languages with the fixture files in [`tests/fixtures`](../tests/fixtures/).
+9. Run the baseline regression suite before merging:
+
+```powershell
+nvim --headless -u tests/minimal_init.lua "+luafile tests/regression.lua"
+```
 
 ## Practical Advice
 
@@ -334,6 +399,6 @@ nvim --headless -u tests/minimal_init.lua "+colorscheme <theme-name>" "+qa"
 
 ## Current Limitations
 
-- The palette contract is still explicit rather than fully abstracted; shared modules currently expect specific slot names.
+- Some low-level UI and delimiter groups still rely on stable palette slots.
 - Theme-specific query assets are intentionally out of scope for the first phase.
 - The second built-in theme will be the real test of whether the current contract is wide enough.

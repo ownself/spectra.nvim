@@ -68,18 +68,34 @@ function M.roles(C, O)
     text = { fg = C.fg },
     identifier = { fg = C.fg_muted },
     local_variable = { fg = C.fg_muted },
+    builtin_variable = { fg = C.purple },
     comment = { fg = C.comment, italic = vim.tbl_contains(styles.comments or {}, "italic") },
     keyword = { fg = C.pink },
+    preproc = { fg = C.pink },
     function_name = { fg = C.green },
+    function_builtin = { fg = C.cyan },
     type = { fg = C.cyan },
+    builtin_type = { fg = C.cyan },
+    type_parameter = { fg = C.purple },
+    constructor = { fg = C.cyan },
     parameter = { fg = C.fg_parameter, italic = vim.tbl_contains(styles.parameters or {}, "italic") },
+    label = { fg = C.subtle },
     field = { fg = C.orange },
     property = { fg = C.amber },
     constant = { fg = C.purple, bold = true },
+    macro = { fg = C.purple },
     string = { fg = C.yellow },
+    character = { fg = C.yellow },
+    number = { fg = C.purple },
     escape = { fg = C.orange },
+    regexp = { fg = C.pink },
+    special = { fg = C.orange },
+    tag = { fg = C.pink },
+    attribute = { fg = C.green },
     operator = { fg = C.pink },
     module = { fg = C.cyan },
+    uri = { fg = C.cyan, underline = true },
+    todo = { fg = C.bg, bg = C.pink, bold = true },
     diagnostic_error = { fg = C.red },
     diagnostic_warn = { fg = C.orange },
     diagnostic_info = { fg = C.cyan },
@@ -96,6 +112,10 @@ M.meta = {
   background = "dark",
 }
 
-M.overrides = {}
+M.overrides = {
+  modules = {},
+  integrations = {},
+  languages = {},
+}
 
 return M

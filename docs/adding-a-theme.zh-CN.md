@@ -41,11 +41,19 @@ lua/spectra/themes/gruvbox_soft.lua
 例如：
 
 ```lua
-local builtin_themes = {
-  ["dracula-colorful"] = "spectra.themes.dracula_colorful",
-  ["gruvbox-soft"] = "spectra.themes.gruvbox_soft",
+local registry = {
+  themes = {
+    ["dracula-colorful"] = {
+      module = "spectra.themes.dracula_colorful",
+    },
+    ["gruvbox-soft"] = {
+      module = "spectra.themes.gruvbox_soft",
+    },
+  },
 }
 ```
+
+如果主题属于某个 family，应把具体 flavour 注册在 `themes` 中，再把 family 默认值注册到 `families`，而不是复制一份扁平的重复入口。
 
 3. 如果你希望用户可以直接通过 `:colorscheme <name>` 加载它，还需要添加一个对应的入口文件：
 
@@ -139,18 +147,34 @@ function M.roles(C, O)
     text = { fg = C.fg },
     identifier = { fg = C.fg_muted },
     local_variable = { fg = C.fg_muted },
+    builtin_variable = { fg = "#C4B5FD" },
     comment = { fg = C.comment, italic = vim.tbl_contains(styles.comments or {}, "italic") },
     keyword = { fg = C.pink },
+    preproc = { fg = C.pink },
     function_name = { fg = C.green },
+    function_builtin = { fg = C.cyan },
     type = { fg = C.cyan },
+    builtin_type = { fg = C.cyan },
+    type_parameter = { fg = "#C4B5FD" },
+    constructor = { fg = C.cyan },
     parameter = { fg = C.fg_parameter, italic = vim.tbl_contains(styles.parameters or {}, "italic") },
+    label = { fg = C.subtle },
     field = { fg = C.orange },
     property = { fg = C.amber },
     constant = { fg = C.purple, bold = true },
+    macro = { fg = C.purple },
     string = { fg = C.yellow },
+    character = { fg = C.yellow },
+    number = { fg = C.purple },
     escape = { fg = C.orange },
+    regexp = { fg = C.pink },
+    special = { fg = C.orange },
+    tag = { fg = C.pink },
+    attribute = { fg = C.green },
     operator = { fg = C.pink },
     module = { fg = C.cyan },
+    uri = { fg = C.cyan, underline = true },
+    todo = { fg = C.bg, bg = C.pink, bold = true },
     diagnostic_error = { fg = C.red },
     diagnostic_warn = { fg = C.orange },
     diagnostic_info = { fg = C.cyan },
@@ -167,7 +191,11 @@ M.meta = {
   background = "dark",
 }
 
-M.overrides = {}
+M.overrides = {
+  modules = {},
+  integrations = {},
+  languages = {},
+}
 
 return M
 ```
@@ -198,16 +226,15 @@ M.meta = {
 
 `palette()` 返回共享运行时所消费的原始颜色槽位。
 
-当前共享模块默认会依赖一组较稳定的键名，例如：
+共享运行时现在会优先消费 `roles()`，而 `palette()` 的稳定契约被收敛到了较少的一组低层颜色槽位：
 
 - 背景类：`bg`、`bg_dark`、`bg_darker`、`bg_float`、`bg_cursorline`、`bg_selection`
 - 前景类：`fg`、`fg_muted`、`fg_parameter`
-- 强调色：`comment`、`cyan`、`green`、`orange`、`amber`、`pink`、`purple`、`red`、`yellow`、`sky`、`teal`
 - UI 辅助色：`subtle`、`gutter`、`guide`、`border`
 - 分隔符色：`braces`、`brackets`、`parens`、`rainbow`
 - 特殊值：`none`、`terminal`
 
-如果缺少共享模块依赖的颜色槽位，部分高亮组可能会缺失或报错。
+你仍然可以定义额外 palette 键给主题内部使用，但新的共享模块应尽量避免直接依赖这些额外键，而是优先通过 `roles()` 表达语义。
 
 ## `roles(C, O)`
 
@@ -227,18 +254,34 @@ M.meta = {
 - `text`
 - `identifier`
 - `local_variable`
+- `builtin_variable`
 - `comment`
 - `keyword`
+- `preproc`
 - `function_name`
+- `function_builtin`
 - `type`
+- `builtin_type`
+- `type_parameter`
+- `constructor`
 - `parameter`
+- `label`
 - `field`
 - `property`
 - `constant`
+- `macro`
 - `string`
+- `character`
+- `number`
 - `escape`
+- `regexp`
+- `special`
+- `tag`
+- `attribute`
 - `operator`
 - `module`
+- `uri`
+- `todo`
 - `diagnostic_error`
 - `diagnostic_warn`
 - `diagnostic_info`
@@ -251,7 +294,14 @@ M.meta = {
 
 `overrides` 是可选项。只有在共享运行时不够表达你的主题意图时，才建议使用。
 
-当前支持的键与共享模块名称一致：
+现在推荐按作用域来组织：
+
+- `modules`
+- `integrations`
+- `languages`
+- `all`
+
+其中 `modules` 下可以继续使用共享模块名：
 
 - `editor`
 - `syntax`
@@ -259,9 +309,8 @@ M.meta = {
 - `lsp`
 - `semantic_tokens`
 - `integrations`
-- `all`
 
-每个 override 都是一个函数：
+每个 provider 可以是一个函数：
 
 ```lua
 function(C, R, O)
@@ -275,13 +324,24 @@ end
 
 ```lua
 M.overrides = {
-  editor = function(C)
-    return {
-      FloatTitle = { fg = C.orange, bold = true },
-    }
-  end,
+  modules = {
+    editor = function(C)
+      return {
+        FloatTitle = { fg = C.orange, bold = true },
+      }
+    end,
+  },
+  integrations = {
+    cmp = function(C)
+      return {
+        CmpItemKindFunction = { fg = C.orange, bold = true },
+      }
+    end,
+  },
 }
 ```
+
+`languages` 目前作为未来的语言类别 override 扩展位保留下来。第一版不会引入很重的 DSL，但主题文件结构已经为后续演进预留好空间。
 
 应尽量少用 overrides。如果一个颜色决策本质上属于语义角色，优先调整 `roles()`，而不是在 override 里打补丁。
 
@@ -324,6 +384,11 @@ nvim --headless -u tests/minimal_init.lua "+colorscheme <theme-name>" "+qa"
 ```
 
 8. 用 [`tests/fixtures`](../tests/fixtures/) 里的样例文件检查目标语言的表现。
+9. 合并前再跑一次基础回归检查：
+
+```powershell
+nvim --headless -u tests/minimal_init.lua "+luafile tests/regression.lua"
+```
 
 ## 实践建议
 
@@ -334,6 +399,6 @@ nvim --headless -u tests/minimal_init.lua "+colorscheme <theme-name>" "+qa"
 
 ## 当前限制
 
-- palette 契约目前仍然比较显式，共享模块依然依赖一些固定槽位名。
+- 一些低层 UI 和分隔符高亮仍然需要稳定 palette 槽位。
 - 主题专属 query 资产在第一阶段是明确不支持的。
 - 真正检验这套契约是否足够好的关键，是第二个内建主题落地时的体验。

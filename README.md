@@ -8,7 +8,7 @@ The built-in themes currently include `dracula-colorful` plus four Catppuccin fl
 
 - keep the high-fidelity Rider-inspired `dracula-colorful` rendering
 - share TreeSitter, LSP, semantic token, and integration support across themes
-- let new themes plug into a stable palette-and-roles contract instead of copying the whole runtime
+- let new themes plug into a role-first contract instead of copying the whole runtime
 - preserve `:colorscheme dracula-colorful` compatibility while introducing a reusable engine
 
 ## First-Phase Scope
@@ -66,6 +66,14 @@ Each built-in theme is expected to provide:
 
 The engine owns the shared highlighting runtime. Themes primarily describe color intent rather than reimplementing the whole stack.
 
+The registry now models three distinct concepts:
+
+- canonical themes such as `dracula-colorful` and `catppuccin-macchiato`
+- theme families such as `catppuccin`
+- aliases that can resolve to canonical themes without duplicating theme definitions
+
+`catppuccin` is resolved as a family-level name and currently defaults to `catppuccin-macchiato`.
+
 For a step-by-step guide to adding a new built-in theme, see [docs/adding-a-theme.md](./docs/adding-a-theme.md).
 中文版本见 [docs/adding-a-theme.zh-CN.md](./docs/adding-a-theme.zh-CN.md)。
 Catppuccin family compatibility notes are documented in [docs/catppuccin-compat.md](./docs/catppuccin-compat.md)。
@@ -106,6 +114,10 @@ The following Catppuccin flavours are available:
 
 These flavours reuse the shared `spectra` runtime while importing the original Catppuccin flavour palettes and family-level semantic intent.
 
+Family default:
+
+- `:colorscheme catppuccin` loads `catppuccin-macchiato`
+
 Example:
 
 ```lua
@@ -131,3 +143,16 @@ Minimal headless check:
 ```powershell
 nvim --headless -u tests/minimal_init.lua "+colorscheme dracula-colorful" "+qa"
 ```
+
+Baseline regression suite:
+
+```powershell
+nvim --headless -u tests/minimal_init.lua "+luafile tests/regression.lua"
+```
+
+The regression suite currently checks:
+
+- canonical theme loading
+- family default resolution for `catppuccin`
+- background mode for dark and light themes
+- a stable set of shared highlight groups across runtime modules
