@@ -54,6 +54,45 @@ local cases = {
       "Visual",
     },
   },
+  {
+    requested = "tokyonight",
+    canonical = "tokyonight-moon",
+    background = "dark",
+    colors_name = "tokyonight",
+    groups = {
+      "Normal",
+      "@tag",
+      "@lsp.type.parameter",
+      "FloatTitle",
+      "MatchParen",
+    },
+  },
+  {
+    requested = "tokyonight-storm",
+    canonical = "tokyonight-storm",
+    background = "dark",
+    colors_name = "tokyonight-storm",
+    groups = {
+      "Normal",
+      "@function",
+      "@lsp.type.property",
+      "PmenuSel",
+      "DiagnosticWarn",
+    },
+  },
+  {
+    requested = "tokyonight-day",
+    canonical = "tokyonight-day",
+    background = "light",
+    colors_name = "tokyonight-day",
+    groups = {
+      "Normal",
+      "@string",
+      "@comment.todo",
+      "FloatBorder",
+      "Visual",
+    },
+  },
 }
 
 local function expect(condition, message)

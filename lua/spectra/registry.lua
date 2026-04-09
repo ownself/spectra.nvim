@@ -25,6 +25,26 @@ local registry = {
       family = "catppuccin",
       flavour = "latte",
     },
+    ["tokyonight-moon"] = {
+      module = "spectra.themes.tokyonight_moon",
+      family = "tokyonight",
+      flavour = "moon",
+    },
+    ["tokyonight-storm"] = {
+      module = "spectra.themes.tokyonight_storm",
+      family = "tokyonight",
+      flavour = "storm",
+    },
+    ["tokyonight-night"] = {
+      module = "spectra.themes.tokyonight_night",
+      family = "tokyonight",
+      flavour = "night",
+    },
+    ["tokyonight-day"] = {
+      module = "spectra.themes.tokyonight_day",
+      family = "tokyonight",
+      flavour = "day",
+    },
   },
   families = {
     catppuccin = {
@@ -34,6 +54,15 @@ local registry = {
         "catppuccin-macchiato",
         "catppuccin-frappe",
         "catppuccin-latte",
+      },
+    },
+    tokyonight = {
+      default = "tokyonight-moon",
+      flavours = {
+        "tokyonight-moon",
+        "tokyonight-storm",
+        "tokyonight-night",
+        "tokyonight-day",
       },
     },
   },
