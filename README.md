@@ -9,7 +9,7 @@ The built-in themes currently include `dracula-colorful`, four Catppuccin flavou
 - keep the high-fidelity Rider-inspired `dracula-colorful` rendering
 - share TreeSitter, LSP, semantic token, and integration support across themes
 - let new themes plug into a role-first contract instead of copying the whole runtime
-- preserve `:colorscheme dracula-colorful` compatibility while introducing a reusable engine
+- provide a reusable theme engine with first-party built-in theme families
 
 ## First-Phase Scope
 
@@ -48,15 +48,6 @@ Lazy.nvim example:
 }
 ```
 
-Compatibility wrapper:
-
-```lua
-require("dracula-colorful").setup({
-  transparent_background = false,
-})
-vim.cmd.colorscheme("dracula-colorful")
-```
-
 ## Theme Contract
 
 Each built-in theme is expected to provide:
@@ -80,6 +71,7 @@ The registry now models three distinct concepts:
 
 For a step-by-step guide to adding a new built-in theme, see [docs/adding-a-theme.md](./docs/adding-a-theme.md).
 中文版本见 [docs/adding-a-theme.zh-CN.md](./docs/adding-a-theme.zh-CN.md)。
+架构导读见 [docs/architecture.zh-CN.md](./docs/architecture.zh-CN.md)。
 Catppuccin family compatibility notes are documented in [docs/catppuccin-compat.md](./docs/catppuccin-compat.md)。
 中文版本见 [docs/catppuccin-compat.zh-CN.md](./docs/catppuccin-compat.zh-CN.md)。
 Tokyonight family compatibility notes are documented in [docs/tokyonight-compat.md](./docs/tokyonight-compat.md)。
@@ -198,6 +190,10 @@ For differences from the source `kanagawa.nvim` plugin, see [docs/kanagawa-compa
 - Some Rider visuals come from IDE behavior rather than colorscheme data.
 
 ## Development
+
+Architecture walkthrough:
+
+- start with [docs/architecture.zh-CN.md](./docs/architecture.zh-CN.md)
 
 Minimal headless check:
 
