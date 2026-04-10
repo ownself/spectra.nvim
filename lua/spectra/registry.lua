@@ -45,6 +45,21 @@ local registry = {
       family = "tokyonight",
       flavour = "day",
     },
+    ["kanagawa-wave"] = {
+      module = "spectra.themes.kanagawa_wave",
+      family = "kanagawa",
+      flavour = "wave",
+    },
+    ["kanagawa-dragon"] = {
+      module = "spectra.themes.kanagawa_dragon",
+      family = "kanagawa",
+      flavour = "dragon",
+    },
+    ["kanagawa-lotus"] = {
+      module = "spectra.themes.kanagawa_lotus",
+      family = "kanagawa",
+      flavour = "lotus",
+    },
   },
   families = {
     catppuccin = {
@@ -63,6 +78,14 @@ local registry = {
         "tokyonight-storm",
         "tokyonight-night",
         "tokyonight-day",
+      },
+    },
+    kanagawa = {
+      default = "kanagawa-wave",
+      flavours = {
+        "kanagawa-wave",
+        "kanagawa-dragon",
+        "kanagawa-lotus",
       },
     },
   },

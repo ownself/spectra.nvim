@@ -2,7 +2,7 @@
 
 A Neovim 0.12+ semantic colorscheme engine with first-class TreeSitter and LSP support.
 
-The built-in themes currently include `dracula-colorful`, four Catppuccin flavours, and four Tokyonight flavours.
+The built-in themes currently include `dracula-colorful`, four Catppuccin flavours, four Tokyonight flavours, and three Kanagawa flavours.
 
 ## Goals
 
@@ -20,6 +20,7 @@ The current `spectra.nvim` phase delivers:
 - `dracula-colorful` as the first built-in theme
 - `catppuccin-mocha`, `catppuccin-macchiato`, `catppuccin-frappe`, and `catppuccin-latte` as a second built-in theme family
 - `tokyonight-moon`, `tokyonight-storm`, `tokyonight-night`, and `tokyonight-day` as a third built-in theme family
+- `kanagawa-wave`, `kanagawa-dragon`, and `kanagawa-lotus` as a fourth built-in theme family
 - shared `after/queries` language refinements
 - shared editor, syntax, TreeSitter, LSP, semantic token, and integration modules
 - migrated fixtures and headless validation helpers
@@ -69,12 +70,13 @@ The engine owns the shared highlighting runtime. Themes primarily describe color
 
 The registry now models three distinct concepts:
 
-- canonical themes such as `dracula-colorful`, `catppuccin-macchiato`, and `tokyonight-moon`
-- theme families such as `catppuccin` and `tokyonight`
+- canonical themes such as `dracula-colorful`, `catppuccin-macchiato`, `tokyonight-moon`, and `kanagawa-wave`
+- theme families such as `catppuccin`, `tokyonight`, and `kanagawa`
 - aliases that can resolve to canonical themes without duplicating theme definitions
 
 `catppuccin` is resolved as a family-level name and currently defaults to `catppuccin-macchiato`.
 `tokyonight` is resolved as a family-level name and currently defaults to `tokyonight-moon`.
+`kanagawa` is resolved as a family-level name and currently defaults to `kanagawa-wave`.
 
 For a step-by-step guide to adding a new built-in theme, see [docs/adding-a-theme.md](./docs/adding-a-theme.md).
 中文版本见 [docs/adding-a-theme.zh-CN.md](./docs/adding-a-theme.zh-CN.md)。
@@ -82,6 +84,8 @@ Catppuccin family compatibility notes are documented in [docs/catppuccin-compat.
 中文版本见 [docs/catppuccin-compat.zh-CN.md](./docs/catppuccin-compat.zh-CN.md)。
 Tokyonight family compatibility notes are documented in [docs/tokyonight-compat.md](./docs/tokyonight-compat.md)。
 中文版本见 [docs/tokyonight-compat.zh-CN.md](./docs/tokyonight-compat.zh-CN.md)。
+Kanagawa family compatibility notes are documented in [docs/kanagawa-compat.md](./docs/kanagawa-compat.md)。
+中文版本见 [docs/kanagawa-compat.zh-CN.md](./docs/kanagawa-compat.zh-CN.md)。
 
 ## Fallback Order
 
@@ -161,6 +165,32 @@ vim.cmd.colorscheme("tokyonight")
 For differences from the source `tokyonight.nvim` plugin, see [docs/tokyonight-compat.md](./docs/tokyonight-compat.md).
 中文说明见 [docs/tokyonight-compat.zh-CN.md](./docs/tokyonight-compat.zh-CN.md)。
 
+## Built-in Theme Family: Kanagawa
+
+The following Kanagawa flavours are available:
+
+- `kanagawa-wave`
+- `kanagawa-dragon`
+- `kanagawa-lotus`
+
+These flavours reuse the shared `spectra` runtime while preserving Kanagawa-inspired palette identity, semantic layering, and the original dark/light family split.
+
+Family default:
+
+- `:colorscheme kanagawa` loads `kanagawa-wave`
+
+Example:
+
+```lua
+require("spectra").setup({
+  theme = "kanagawa",
+})
+vim.cmd.colorscheme("kanagawa")
+```
+
+For differences from the source `kanagawa.nvim` plugin, see [docs/kanagawa-compat.md](./docs/kanagawa-compat.md).
+中文说明见 [docs/kanagawa-compat.zh-CN.md](./docs/kanagawa-compat.zh-CN.md)。
+
 ## Known Fidelity Gaps
 
 - IntelliJ exposes token categories that Neovim cannot represent uniformly.
@@ -186,5 +216,6 @@ The regression suite currently checks:
 - canonical theme loading
 - family default resolution for `catppuccin`
 - family default resolution for `tokyonight`
+- family default resolution for `kanagawa`
 - background mode for dark and light themes
 - a stable set of shared highlight groups across runtime modules

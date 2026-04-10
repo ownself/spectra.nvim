@@ -93,6 +93,45 @@ local cases = {
       "Visual",
     },
   },
+  {
+    requested = "kanagawa",
+    canonical = "kanagawa-wave",
+    background = "dark",
+    colors_name = "kanagawa",
+    groups = {
+      "Normal",
+      "@tag",
+      "@lsp.type.parameter",
+      "FloatTitle",
+      "MatchParen",
+    },
+  },
+  {
+    requested = "kanagawa-dragon",
+    canonical = "kanagawa-dragon",
+    background = "dark",
+    colors_name = "kanagawa-dragon",
+    groups = {
+      "Normal",
+      "@function",
+      "@lsp.type.property",
+      "PmenuSel",
+      "DiagnosticWarn",
+    },
+  },
+  {
+    requested = "kanagawa-lotus",
+    canonical = "kanagawa-lotus",
+    background = "light",
+    colors_name = "kanagawa-lotus",
+    groups = {
+      "Normal",
+      "@string",
+      "@comment.todo",
+      "FloatBorder",
+      "Visual",
+    },
+  },
 }
 
 local function expect(condition, message)
