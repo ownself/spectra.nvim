@@ -72,7 +72,7 @@ local registry = {
       },
     },
     tokyonight = {
-      default = "tokyonight-moon",
+      default = "tokyonight-storm",
       flavours = {
         "tokyonight-moon",
         "tokyonight-storm",

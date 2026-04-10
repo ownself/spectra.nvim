@@ -56,7 +56,7 @@ local cases = {
   },
   {
     requested = "tokyonight",
-    canonical = "tokyonight-moon",
+    canonical = "tokyonight-storm",
     background = "dark",
     colors_name = "tokyonight",
     groups = {
