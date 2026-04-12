@@ -1,217 +1,190 @@
 # spectra.nvim
 
-A Neovim 0.12+ semantic colorscheme engine with first-class TreeSitter and LSP support.
+A progressive palette colorscheme for Neovim 0.12+.
 
-The built-in themes currently include `dracula-colorful`, four Catppuccin flavours, four Tokyonight flavours, and three Kanagawa flavours.
+spectra.nvim uses a **5-layer fallback palette** — provide as few as 2 colors (`fg` + `bg`) and get a complete, coherent theme. Add more colors to progressively refine the result.
 
-## Goals
+## Features
 
-- keep the high-fidelity Rider-inspired `dracula-colorful` rendering
-- share TreeSitter, LSP, semantic token, and integration support across themes
-- let new themes plug into a role-first contract instead of copying the whole runtime
-- provide a reusable theme engine with first-party built-in theme families
-
-## First-Phase Scope
-
-The current `spectra.nvim` phase delivers:
-
-- a shared engine runtime under `lua/spectra/`
-- a built-in theme registry
-- `dracula-colorful` as the first built-in theme
-- `catppuccin-mocha`, `catppuccin-macchiato`, `catppuccin-frappe`, and `catppuccin-latte` as a second built-in theme family
-- `tokyonight-moon`, `tokyonight-storm`, `tokyonight-night`, and `tokyonight-day` as a third built-in theme family
-- `kanagawa-wave`, `kanagawa-dragon`, and `kanagawa-lotus` as a fourth built-in theme family
-- shared `after/queries` language refinements
-- shared editor, syntax, TreeSitter, LSP, semantic token, and integration modules
-- migrated fixtures and headless validation helpers
+- **Progressive palette**: 2 colors produce a usable theme; 75 slots give full control
+- **5-layer fallback chain**: base → accent → role → full → variant
+- **Built-in themes**: `default`, `dracula-colorful`, `catppuccin-macchiato`, `tokyonight-storm`, `kanagawa-wave`
+- **Transparent background** support
+- **Dark / Light / Auto** style switching
+- **Callbacks** for runtime color and highlight customization
+- TreeSitter, LSP, Diagnostic highlight support
+- Plugin integrations (Telescope, NvimTree, Gitsigns, indent-blankline)
 
 ## Installation
 
-Lazy.nvim example:
+With [lazy.nvim](https://github.com/folke/lazy.nvim):
 
 ```lua
 {
-  dir = "ownself/spectra.nvim",
-  name = "spectra.nvim",
+  "your-username/spectra.nvim",
+  lazy = false,
   priority = 1000,
   config = function()
-    require("spectra").setup({
-      theme = "catppuccin-mocha",
-      transparent_background = false,
-      styles = {
-        comments = { "italic" },
-        parameters = { "italic" },
-      },
-    })
-    vim.cmd.colorscheme("catppuccin-mocha")
+    require("spectra").setup({})
+    vim.cmd("colorscheme spectra")
   end,
 }
 ```
 
-## Theme Contract
+## Quick Start
 
-Each built-in theme is expected to provide:
+```lua
+-- Minimal: just 2 colors
+require("spectra").setup({
+  palette = {
+    fg = "#d4d4d4",
+    bg = "#1e1e1e",
+  },
+})
+vim.cmd("colorscheme spectra")
+```
 
-- `meta`: public identity and background mode
-- `palette`: raw color slots and terminal colors
-- `roles`: semantic role mapping derived from the palette
-- `overrides`: optional scoped overrides for shared runtime modules
-
-The engine owns the shared highlighting runtime. Themes primarily describe color intent rather than reimplementing the whole stack.
-
-The registry now models three distinct concepts:
-
-- canonical themes such as `dracula-colorful`, `catppuccin-macchiato`, `tokyonight-moon`, and `kanagawa-wave`
-- theme families such as `catppuccin`, `tokyonight`, and `kanagawa`
-- aliases that can resolve to canonical themes without duplicating theme definitions
-
-`catppuccin` is resolved as a family-level name and currently defaults to `catppuccin-macchiato`.
-`tokyonight` is resolved as a family-level name and currently defaults to `tokyonight-moon`.
-`kanagawa` is resolved as a family-level name and currently defaults to `kanagawa-wave`.
-
-For a step-by-step guide to adding a new built-in theme, see [docs/adding-a-theme.md](./docs/adding-a-theme.md).
-中文版本见 [docs/adding-a-theme.zh-CN.md](./docs/adding-a-theme.zh-CN.md)。
-架构导读见 [docs/architecture.zh-CN.md](./docs/architecture.zh-CN.md)。
-Catppuccin family compatibility notes are documented in [docs/catppuccin-compat.md](./docs/catppuccin-compat.md)。
-中文版本见 [docs/catppuccin-compat.zh-CN.md](./docs/catppuccin-compat.zh-CN.md)。
-Tokyonight family compatibility notes are documented in [docs/tokyonight-compat.md](./docs/tokyonight-compat.md)。
-中文版本见 [docs/tokyonight-compat.zh-CN.md](./docs/tokyonight-compat.zh-CN.md)。
-Kanagawa family compatibility notes are documented in [docs/kanagawa-compat.md](./docs/kanagawa-compat.md)。
-中文版本见 [docs/kanagawa-compat.zh-CN.md](./docs/kanagawa-compat.zh-CN.md)。
-
-## Fallback Order
-
-Highlight resolution follows this order:
-
-1. language-specific override
-2. semantic token override
-3. TreeSitter capture mapping
-4. semantic role mapping
-5. base palette default
-
-This keeps the shared query and semantic runtime intact while allowing themes to stay compact.
-
-## Built-in Theme: dracula-colorful
-
-`dracula-colorful` still uses Rider `Dracula Colorful` as the primary semantic reference.
-
-Intentional departures from `dracula.vim` remain:
-
-- comments are brighter blue to match Rider's comment rendering
-- identifiers and parameters use a muted foreground instead of classic Dracula white or orange
-- fields and properties are orange
-- classes, interfaces, and namespaces are cyan
-- constants and static symbols are purple
-
-## Built-in Theme Family: Catppuccin
-
-The following Catppuccin flavours are available:
-
-- `catppuccin-mocha`
-- `catppuccin-macchiato`
-- `catppuccin-frappe`
-- `catppuccin-latte`
-
-These flavours reuse the shared `spectra` runtime while importing the original Catppuccin flavour palettes and family-level semantic intent.
-
-Family default:
-
-- `:colorscheme catppuccin` loads `catppuccin-macchiato`
-
-Example:
+## Using Built-in Themes
 
 ```lua
 require("spectra").setup({
-  theme = "catppuccin-latte",
+  theme = "dracula-colorful",  -- or "catppuccin-macchiato", "tokyonight-storm", "kanagawa-wave"
 })
-vim.cmd.colorscheme("catppuccin-latte")
+vim.cmd("colorscheme spectra")
 ```
 
-For differences from the source `catppuccin.nvim` plugin, see [docs/catppuccin-compat.md](./docs/catppuccin-compat.md).
-中文说明见 [docs/catppuccin-compat.zh-CN.md](./docs/catppuccin-compat.zh-CN.md)。
+Available themes:
 
-## Built-in Theme Family: Tokyonight
+| Theme | Description |
+|---|---|
+| `default` | Neutral dark theme |
+| `dracula-colorful` | Vibrant Dracula variant |
+| `catppuccin-macchiato` | Catppuccin Macchiato flavour |
+| `tokyonight-storm` | Tokyo Night Storm variant |
+| `kanagawa-wave` | Kanagawa Wave variant |
 
-The following Tokyonight flavours are available:
-
-- `tokyonight-moon`
-- `tokyonight-storm`
-- `tokyonight-night`
-- `tokyonight-day`
-
-These flavours also reuse the shared `spectra` runtime while importing Tokyonight-inspired palette identity and semantic intent.
-
-Family default:
-
-- `:colorscheme tokyonight` loads `tokyonight-moon`
-
-Example:
+## Configuration
 
 ```lua
 require("spectra").setup({
-  theme = "tokyonight",
+  -- Style: "dark", "light", or "auto" (follows vim.o.background)
+  style = "dark",
+
+  -- Built-in theme name
+  theme = "default",
+
+  -- Set false to skip loading the base theme, only use your palette
+  default_theme = true,
+
+  -- Transparent background (for transparent terminals)
+  transparent = false,
+
+  -- Override palette colors (merged on top of the theme)
+  palette = {
+    fg = "#d4d4d4",
+    bg = "#1e1e1e",
+    ["syntax.keyword"] = "#569cd6",
+    ["syntax.function"] = "#dcdcaa",
+  },
+
+  -- Style-specific overrides
+  dark = {
+    ["syntax.comment"] = "#6a9955",
+  },
+  light = {
+    ["syntax.comment"] = "#008000",
+  },
+
+  -- Plugin integrations
+  plugins = {
+    telescope = true,
+    nvim_tree = true,
+    gitsigns = true,
+    indent_blankline = true,
+  },
+
+  -- Callback: modify resolved colors before highlight generation
+  on_colors = function(colors)
+    colors["syntax.comment"] = "#888888"
+  end,
+
+  -- Callback: modify highlight groups after generation
+  on_highlights = function(highlights, colors)
+    highlights.Comment = { fg = colors["syntax.comment"], italic = false }
+  end,
 })
-vim.cmd.colorscheme("tokyonight")
 ```
 
-For differences from the source `tokyonight.nvim` plugin, see [docs/tokyonight-compat.md](./docs/tokyonight-compat.md).
-中文说明见 [docs/tokyonight-compat.zh-CN.md](./docs/tokyonight-compat.zh-CN.md)。
+## Palette Layers
 
-## Built-in Theme Family: Kanagawa
+The palette is organized in 5 layers. Each layer falls back to the layer above it when a color is not provided.
 
-The following Kanagawa flavours are available:
+### Layer 0 — Base (2 slots)
 
-- `kanagawa-wave`
-- `kanagawa-dragon`
-- `kanagawa-lotus`
+`fg`, `bg`
 
-These flavours reuse the shared `spectra` runtime while preserving Kanagawa-inspired palette identity, semantic layering, and the original dark/light family split.
+### Layer 1 — Accent (6 slots)
 
-Family default:
+Semantic accent colors that drive all downstream layers.
 
-- `:colorscheme kanagawa` loads `kanagawa-wave`
+`accent.danger`, `accent.success`, `accent.info`, `accent.caution`, `accent.action`, `accent.control`
 
-Example:
+### Layer 2 — Role (8 slots)
+
+Syntax and diagnostic role colors, derived from accents.
+
+`syntax.keyword`, `syntax.string`, `syntax.function`, `syntax.comment`, `syntax.type`, `diag.error`, `diag.warn`, `diff.add`
+
+### Layer 3 — Full (20 slots)
+
+Complete functional colors for syntax, diagnostics, diffs, and UI.
+
+**Syntax**: `syntax.constant`, `syntax.identifier`, `syntax.special`, `syntax.operator`, `syntax.preproc`
+
+**Diagnostic**: `diag.info`, `diag.hint`, `diag.ok`
+
+**Diff**: `diff.change`, `diff.delete`
+
+**UI**: `ui.cursorline`, `ui.float`, `ui.visual`, `ui.linenr`, `ui.pmenu`, `ui.statusline`, `ui.search`
+
+### Layer 4 — Variant (39 slots)
+
+Fine-grained overrides for specific sub-categories.
+
+**Syntax variants**: `syntax.function.builtin`, `syntax.function.method`, `syntax.type.builtin`, `syntax.type.module`, `syntax.type.constructor`, `syntax.constant.builtin`, `syntax.constant.character`, `syntax.constant.macro`, `syntax.identifier.member`, `syntax.identifier.parameter`, `syntax.identifier.builtin`, `syntax.identifier.field`, `syntax.string.escape`, `syntax.string.special`, `syntax.comment.doc`, `syntax.preproc.include`, `syntax.preproc.macro`, `syntax.tag`, `syntax.label`, `syntax.delimiter`, `syntax.variable`, `syntax.type.definition`
+
+**Diagnostic/Diff variants**: `diag.error.bg`, `diag.error.subtle`, `diag.warn.bg`, `diag.warn.subtle`, `diag.info.bg`, `diag.info.subtle`, `diag.hint.bg`, `diag.hint.subtle`, `diag.ok.bg`, `diag.ok.subtle`, `diff.add.bg`, `diff.change.bg`, `diff.delete.bg`
+
+**UI variants**: `ui.float.bg`, `ui.float.subtle`, `ui.pmenu.bg`, `ui.pmenu.subtle`, `ui.search.bg`, `ui.statusline.bg`, `ui.visual.bg`
+
+## Progressive Example
 
 ```lua
-require("spectra").setup({
-  theme = "kanagawa",
-})
-vim.cmd.colorscheme("kanagawa")
+-- Tier 1: Just fg + bg → all 75 slots auto-derived
+{ fg = "#c0caf5", bg = "#1a1b26" }
+
+-- Tier 3: Add 6 accents → syntax, diagnostics, diffs all follow
+{
+  fg = "#c0caf5", bg = "#1a1b26",
+  ["accent.danger"]  = "#f7768e",
+  ["accent.success"] = "#9ece6a",
+  ["accent.info"]    = "#7aa2f7",
+  ["accent.caution"] = "#e0af68",
+  ["accent.action"]  = "#7aa2f7",
+  ["accent.control"] = "#bb9af7",
+}
+
+-- Tier 6: Override specific variants for fine control
+{
+  fg = "#c0caf5", bg = "#1a1b26",
+  ["accent.control"] = "#bb9af7",
+  ["syntax.keyword"] = "#bb9af7",
+  ["syntax.function.builtin"] = "#7dcfff",
+  ["syntax.type.builtin"] = "#73daca",
+  ["syntax.string.escape"] = "#f7768e",
+}
 ```
 
-For differences from the source `kanagawa.nvim` plugin, see [docs/kanagawa-compat.md](./docs/kanagawa-compat.md).
-中文说明见 [docs/kanagawa-compat.zh-CN.md](./docs/kanagawa-compat.zh-CN.md)。
+## License
 
-## Known Fidelity Gaps
-
-- IntelliJ exposes token categories that Neovim cannot represent uniformly.
-- Semantic token fidelity depends on the language server.
-- Some Rider visuals come from IDE behavior rather than colorscheme data.
-
-## Development
-
-Architecture walkthrough:
-
-- start with [docs/architecture.zh-CN.md](./docs/architecture.zh-CN.md)
-
-Minimal headless check:
-
-```powershell
-nvim --headless -u tests/minimal_init.lua "+colorscheme dracula-colorful" "+qa"
-```
-
-Baseline regression suite:
-
-```powershell
-nvim --headless -u tests/minimal_init.lua "+luafile tests/regression.lua"
-```
-
-The regression suite currently checks:
-
-- canonical theme loading
-- family default resolution for `catppuccin`
-- family default resolution for `tokyonight`
-- family default resolution for `kanagawa`
-- background mode for dark and light themes
-- a stable set of shared highlight groups across runtime modules
+MIT

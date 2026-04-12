@@ -1,62 +1,59 @@
-local U = require("spectra.util.color")
+--- LSP semantic token highlight group definitions (L4).
+--- Source: hg-mapping.csv rows where source=LSP (32 groups).
+--- All groups link to their TreeSitter or editor equivalents.
+--- @module spectra.groups.lsp
 
 local M = {}
 
-function M.get(C)
+--- Generate LSP highlight groups from resolved palette.
+--- @param p table<string, string> Resolved palette
+--- @param config table spectra.nvim config
+--- @return table<string, table> HG definitions
+function M.get(p, config)
   return {
-    LspReferenceText = { bg = C.bg_selection },
-    LspReferenceRead = { bg = C.bg_selection },
-    LspReferenceWrite = { bg = C.bg_selection },
+    -- LSP semantic token types → link to TreeSitter captures
+    ["@lsp.type.class"]         = { link = "@type" },
+    ["@lsp.type.comment"]       = { link = "@comment" },
+    ["@lsp.type.decorator"]     = { link = "@attribute" },
+    ["@lsp.type.enum"]          = { link = "@type" },
+    ["@lsp.type.enumMember"]    = { link = "@constant" },
+    ["@lsp.type.event"]         = { link = "@type" },
+    ["@lsp.type.function"]      = { link = "@function" },
+    ["@lsp.type.interface"]     = { link = "@type" },
+    ["@lsp.type.keyword"]       = { link = "@keyword" },
+    ["@lsp.type.macro"]         = { link = "@constant.macro" },
+    ["@lsp.type.method"]        = { link = "@function.method" },
+    ["@lsp.type.modifier"]      = { link = "@type.qualifier" },
+    ["@lsp.type.namespace"]     = { link = "@module" },
+    ["@lsp.type.number"]        = { link = "@number" },
+    ["@lsp.type.operator"]      = { link = "@operator" },
+    ["@lsp.type.parameter"]     = { link = "@variable.parameter" },
+    ["@lsp.type.property"]      = { link = "@property" },
+    ["@lsp.type.regexp"]        = { link = "@string.regexp" },
+    ["@lsp.type.string"]        = { link = "@string" },
+    ["@lsp.type.struct"]        = { link = "@type" },
+    ["@lsp.type.type"]          = { link = "@type" },
+    ["@lsp.type.typeParameter"] = { link = "@type.definition" },
+    ["@lsp.type.variable"]      = { link = "@variable" },
 
-    DiagnosticError = { fg = C.red },
-    DiagnosticWarn = { fg = C.orange },
-    DiagnosticInfo = { fg = C.cyan },
-    DiagnosticHint = { fg = C.sky },
-    DiagnosticOk = { fg = C.green },
+    -- LSP modifier
+    ["@lsp.mod.deprecated"]     = { link = "DiagnosticDeprecated" },
 
-    DiagnosticUnderlineError = { undercurl = true, sp = C.red },
-    DiagnosticUnderlineWarn = { undercurl = true, sp = C.orange },
-    DiagnosticUnderlineInfo = { undercurl = true, sp = C.cyan },
-    DiagnosticUnderlineHint = { undercurl = true, sp = C.sky },
-    DiagnosticUnderlineOk = { undercurl = true, sp = C.green },
+    -- LSP reference highlights
+    LspReferenceText            = { link = "Visual" },
+    LspReferenceRead            = { link = "LspReferenceText" },
+    LspReferenceTarget          = { link = "LspReferenceText" },
+    LspReferenceWrite           = { link = "LspReferenceText" },
 
-    DiagnosticVirtualTextError = { fg = C.red, bg = U.blend(C.red, C.bg, 0.10) },
-    DiagnosticVirtualTextWarn = { fg = C.orange, bg = U.blend(C.orange, C.bg, 0.10) },
-    DiagnosticVirtualTextInfo = { fg = C.cyan, bg = U.blend(C.cyan, C.bg, 0.10) },
-    DiagnosticVirtualTextHint = { fg = C.sky, bg = U.blend(C.sky, C.bg, 0.10) },
-    DiagnosticVirtualTextOk = { fg = C.green, bg = U.blend(C.green, C.bg, 0.10) },
+    -- LSP signature
+    LspSignatureActiveParameter = { link = "Visual" },
 
-    DiagnosticFloatingError = { fg = C.red },
-    DiagnosticFloatingWarn = { fg = C.orange },
-    DiagnosticFloatingInfo = { fg = C.cyan },
-    DiagnosticFloatingHint = { fg = C.sky },
-    DiagnosticFloatingOk = { fg = C.green },
+    -- LSP code lens
+    LspCodeLens                 = { link = "NonText" },
+    LspCodeLensSeparator        = { link = "LspCodeLens" },
 
-    DiagnosticSignError = { fg = C.red },
-    DiagnosticSignWarn = { fg = C.orange },
-    DiagnosticSignInfo = { fg = C.cyan },
-    DiagnosticSignHint = { fg = C.sky },
-    DiagnosticSignOk = { fg = C.green },
-    DiagnosticVirtualLinesError = { fg = C.red },
-    DiagnosticVirtualLinesWarn = { fg = C.orange },
-    DiagnosticVirtualLinesInfo = { fg = C.cyan },
-    DiagnosticVirtualLinesHint = { fg = C.sky },
-
-    LspDiagnosticsDefaultError = { link = "DiagnosticError" },
-    LspDiagnosticsDefaultWarning = { link = "DiagnosticWarn" },
-    LspDiagnosticsDefaultInformation = { link = "DiagnosticInfo" },
-    LspDiagnosticsDefaultHint = { link = "DiagnosticHint" },
-    LspDiagnosticsUnderlineError = { link = "DiagnosticUnderlineError" },
-    LspDiagnosticsUnderlineWarning = { link = "DiagnosticUnderlineWarn" },
-    LspDiagnosticsUnderlineInformation = { link = "DiagnosticUnderlineInfo" },
-    LspDiagnosticsUnderlineHint = { link = "DiagnosticUnderlineHint" },
-    DiagnosticSignOther = { fg = C.subtle },
-
-    LspInlayHint = { fg = C.subtle, bg = U.blend(C.bg_float, C.bg, 0.65), italic = true },
-    LspCodeLens = { fg = C.subtle, italic = true },
-    LspCodeLensSeparator = { fg = C.subtle },
-    LspSignatureActiveParameter = { fg = C.orange, bold = true, underline = true },
-    LspInfoBorder = { link = "FloatBorder" },
+    -- LSP inlay hints
+    LspInlayHint                = { link = "NonText" },
   }
 end
 

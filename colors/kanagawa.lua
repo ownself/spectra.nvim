@@ -1,1 +1,0 @@
-require("spectra").load("kanagawa")

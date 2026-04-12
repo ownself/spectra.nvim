@@ -1,55 +1,84 @@
-local M = {}
-local T = require("spectra.util.theme")
+--- VimSyntax highlight group definitions (L2).
+--- Source: hg-mapping.csv rows where source=VimSyntax (35 groups).
+--- @module spectra.groups.syntax
 
-function M.get(C, R)
-  return {
-    Comment = R.comment,
-    Constant = T.highlight(R, { "constant" }, { fg = C.purple }),
-    String = R.string,
-    Character = T.highlight(R, { "character", "string" }, { fg = C.yellow }),
-    Number = T.highlight(R, { "number", "constant" }, { fg = C.purple }),
-    Boolean = T.highlight(R, { "number", "constant" }, { fg = C.purple }),
-    Float = T.highlight(R, { "number", "constant" }, { fg = C.purple }),
-    Identifier = R.identifier,
-    Function = R.function_name,
-    Statement = R.keyword,
-    Conditional = R.keyword,
-    Repeat = R.keyword,
-    Label = T.highlight(R, { "label", "text" }, { fg = C.subtle }),
-    Operator = R.operator,
-    Keyword = R.keyword,
-    Exception = R.keyword,
-    PreProc = T.highlight(R, { "preproc", "keyword" }, { fg = C.pink }),
-    Include = T.highlight(R, { "preproc", "keyword" }, { fg = C.pink }),
-    Define = T.highlight(R, { "preproc", "keyword" }, { fg = C.pink }),
-    Macro = T.highlight(R, { "macro", "constant" }, { fg = C.purple }),
-    PreCondit = T.highlight(R, { "preproc", "keyword" }, { fg = C.pink }),
-    StorageClass = T.highlight(R, { "keyword", "preproc" }, { fg = C.pink }),
-    Structure = T.highlight(R, { "type", "module" }, { fg = C.cyan }),
-    Typedef = T.highlight(R, { "type", "module" }, { fg = C.cyan }),
-    Type = R.type,
-    Special = T.highlight(R, { "special", "escape" }, { fg = C.orange }),
-    SpecialChar = T.highlight(R, { "special", "escape" }, { fg = C.orange }),
-    Tag = T.highlight(R, { "tag", "keyword" }, { fg = C.pink }),
-    Delimiter = { fg = C.fg },
-    SpecialComment = T.highlight(R, { "preproc", "comment" }, { fg = C.pink }),
-    Debug = { fg = C.red },
-    Underlined = T.highlight(R, { "uri", "module" }, { fg = C.cyan }, { underline = true }),
-    Ignore = { fg = C.subtle },
-    Error = { fg = C.red },
-    Todo = T.highlight(R, { "todo", "keyword" }, { fg = C.bg, bg = C.pink, bold = true }),
-    Conceal = T.highlight(R, { "module", "type" }, { fg = C.cyan }),
-    ErrorMsg = { fg = C.red },
-    MoreMsg = { fg = C.green },
-    ModeMsg = { fg = C.cyan },
-    SpellBad = { undercurl = true, sp = C.red },
-    SpellCap = { undercurl = true, sp = C.cyan },
-    SpellLocal = { undercurl = true, sp = C.orange },
-    SpellRare = { undercurl = true, sp = C.purple },
-    DiagnosticDeprecated = { fg = C.subtle, strikethrough = true },
-    DiagnosticUnnecessary = { fg = C.subtle },
-    QuickFixLine = { bg = C.bg_selection },
+local M = {}
+
+--- Generate VimSyntax highlight groups from resolved palette.
+--- @param p table<string, string> Resolved palette
+--- @param config table spectra.nvim config
+--- @return table<string, table> HG definitions
+function M.get(p, config)
+  local groups = {
+    -- Root syntax groups with direct palette mapping
+    Comment    = { fg = p["syntax.comment"], italic = true },
+    String     = { fg = p["syntax.string"] },
+    Constant   = { fg = p["syntax.constant"] },
+    Function   = { fg = p["syntax.function"] },
+    Identifier = { fg = p["syntax.identifier"] },
+    Statement  = { fg = p["syntax.keyword"], bold = true },
+    Operator   = { fg = p["syntax.operator"] },
+    Delimiter  = { fg = p["syntax.delimiter"] },
+    PreProc    = { fg = p["syntax.preproc"] },
+    Type       = { fg = p["syntax.type"] },
+    Special    = { fg = p["syntax.special"] },
+    Todo       = { fg = p.fg, bold = true },
+    Error      = { fg = p.fg, bg = p["diag.error.bg"] },
+    Underlined = { underline = true },
+
+    -- Statement children → link to Statement
+    Keyword     = { link = "Statement" },
+    Conditional = { link = "Statement" },
+    Repeat      = { link = "Statement" },
+    Exception   = { link = "Statement" },
+
+    -- Constant children → link to Constant
+    Boolean   = { link = "Constant" },
+    Number    = { link = "Constant" },
+    Float     = { link = "Number" },
+
+    -- PreProc children → link to PreProc
+    Include  = { link = "PreProc" },
+    Define   = { link = "PreProc" },
+    Macro    = { link = "PreProc" },
+    PreCondit = { link = "PreProc" },
+
+    -- Type children → link to Type
+    StorageClass = { link = "Type" },
+    Structure    = { link = "Type" },
+    Typedef      = { link = "Type" },
+
+    -- Special children → link to Special
+    SpecialChar    = { link = "Special" },
+    Debug          = { link = "Special" },
+    SpecialComment = { link = "Special" },
+
+    -- Misc
+    Ignore = { link = "Normal" },
   }
+
+  -- Tag: use syntax.tag if distinct from keyword, else link to Special
+  if p["syntax.tag"] ~= p["syntax.keyword"] then
+    groups.Tag = { fg = p["syntax.tag"] }
+  else
+    groups.Tag = { link = "Special" }
+  end
+
+  -- Label: use syntax.label if distinct from keyword, else link to Statement
+  if p["syntax.label"] ~= p["syntax.keyword"] then
+    groups.Label = { fg = p["syntax.label"] }
+  else
+    groups.Label = { link = "Statement" }
+  end
+
+  -- Character: use syntax.constant.character if distinct from constant, else link
+  if p["syntax.constant.character"] ~= p["syntax.constant"] then
+    groups.Character = { fg = p["syntax.constant.character"] }
+  else
+    groups.Character = { link = "Constant" }
+  end
+
+  return groups
 end
 
 return M

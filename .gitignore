@@ -1,0 +1,22 @@
+# Swap files
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.bak
+
+# Lua compiled
+luac.out
+
+# Test output
+*.log
