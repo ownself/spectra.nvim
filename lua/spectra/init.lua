@@ -12,12 +12,38 @@ M._loaded = false
 --- @type number|nil Autocmd group ID
 M._augroup = nil
 
+--- Built-in theme registry: short name → Lua module path.
+--- @type table<string, string>
+M.themes = {
+  ["default"]    = "spectra.themes.default",
+  ["dracula"]    = "spectra.themes.dracula_colorful",
+  ["catppuccin"] = "spectra.themes.catppuccin_macchiato",
+  ["tokyonight"] = "spectra.themes.tokyonight_storm",
+  ["kanagawa"]   = "spectra.themes.kanagawa_wave",
+}
+
 --- Configure spectra.nvim with user options.
 --- Can be called before `:colorscheme spectra`. If not called, defaults are used.
 --- @param opts? spectra.Config User configuration table
 function M.setup(opts)
   local config = require("spectra.config")
   M._config = config.merge(opts or {})
+end
+
+--- Resolve a theme module from name.
+--- @param theme_name string Theme name
+--- @return table theme_mod Theme module with .dark/.light tables
+local function resolve_theme(theme_name)
+  local mod_path = M.themes[theme_name]
+  if mod_path then
+    return require(mod_path)
+  end
+  local ok, mod = pcall(require, "spectra.themes." .. theme_name)
+  if ok then
+    return mod
+  end
+  vim.notify(string.format("Spectra: theme '%s' not found, using default", theme_name), vim.log.levels.WARN)
+  return require("spectra.themes.default")
 end
 
 --- Apply the colorscheme. Called by `colors/spectra.lua`.
@@ -49,28 +75,8 @@ function M.load()
   if config.default_theme == false then
     user_palette = vim.tbl_extend("force", {}, config.palette or {})
   else
-    -- Resolve theme module: built-in name or default
     local theme_name = config.theme or "default"
-    local theme_registry = {
-      ["default"]              = "spectra.themes.default",
-      ["dracula-colorful"]     = "spectra.themes.dracula_colorful",
-      ["catppuccin-macchiato"] = "spectra.themes.catppuccin_macchiato",
-      ["tokyonight-storm"]     = "spectra.themes.tokyonight_storm",
-      ["kanagawa-wave"]        = "spectra.themes.kanagawa_wave",
-    }
-    local theme_mod
-    local mod_path = theme_registry[theme_name]
-    if mod_path then
-      theme_mod = require(mod_path)
-    else
-      local ok, mod = pcall(require, "spectra.themes." .. theme_name)
-      if ok then
-        theme_mod = mod
-      else
-        vim.notify(string.format("Spectra: theme '%s' not found, using default", theme_name), vim.log.levels.WARN)
-        theme_mod = require("spectra.themes.default")
-      end
-    end
+    local theme_mod = resolve_theme(theme_name)
     local base_palette = style == "light" and theme_mod.light or theme_mod.dark
     user_palette = vim.tbl_extend("force", base_palette, config.palette or {})
   end
@@ -145,7 +151,6 @@ function M.load()
       group = M._augroup,
       pattern = "background",
       callback = function()
-        -- Reload with new background value
         M.load()
       end,
     })
@@ -153,5 +158,54 @@ function M.load()
 
   M._loaded = true
 end
+
+--- Switch to a different built-in theme at runtime.
+--- @param theme_name string Theme name (e.g. "dracula", "catppuccin")
+function M.switch(theme_name)
+  if not M._config then
+    M.setup({})
+  end
+  M._config.theme = theme_name
+  M._config.default_theme = true
+  M.load()
+end
+
+--- Register the :Spectra user command.
+function M._register_command()
+  vim.api.nvim_create_user_command("Spectra", function(opts)
+    local arg = opts.args
+    if arg == "" then
+      -- No argument: list available themes and current
+      local current = M._config and M._config.theme or "default"
+      local names = {}
+      for name in pairs(M.themes) do
+        table.insert(names, name)
+      end
+      table.sort(names)
+      local lines = {}
+      for _, name in ipairs(names) do
+        local marker = name == current and " *" or ""
+        table.insert(lines, "  " .. name .. marker)
+      end
+      vim.notify("Spectra themes (* = current):\n" .. table.concat(lines, "\n"), vim.log.levels.INFO)
+    else
+      M.switch(arg)
+    end
+  end, {
+    nargs = "?",
+    complete = function()
+      local names = {}
+      for name in pairs(M.themes) do
+        table.insert(names, name)
+      end
+      table.sort(names)
+      return names
+    end,
+    desc = "Switch spectra.nvim theme",
+  })
+end
+
+-- Register command on module load
+M._register_command()
 
 return M
