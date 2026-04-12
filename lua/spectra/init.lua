@@ -157,6 +157,9 @@ function M.load()
   end
 
   M._loaded = true
+
+  -- Notify plugins (lualine, bufferline, etc.) that colors changed
+  vim.api.nvim_exec_autocmds("ColorScheme", { pattern = "spectra" })
 end
 
 --- Switch to a different built-in theme at runtime.
