@@ -134,7 +134,7 @@ function M.get(p, config)
   -- only if user explicitly differentiated it
   if p["syntax.comment.doc"] ~= p["syntax.comment"] then
     -- Some TS parsers emit @comment.documentation
-    groups["@comment.documentation"] = { fg = p["syntax.comment.doc"], italic = true }
+    groups["@comment.documentation"] = { fg = p["syntax.comment.doc"] }
   end
 
   -- syntax.identifier.member → @property

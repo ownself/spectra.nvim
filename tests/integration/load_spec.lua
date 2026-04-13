@@ -126,7 +126,7 @@ do
   -- Syntax
   local comment = vim.api.nvim_get_hl(0, { name = "Comment" })
   assert_true("Comment has fg", comment.fg ~= nil)
-  assert_eq("Comment italic", comment.italic, true)
+  assert_eq("Comment italic disabled", comment.italic, nil)
 
   local statement = vim.api.nvim_get_hl(0, { name = "Statement" })
   assert_true("Statement has fg", statement.fg ~= nil)

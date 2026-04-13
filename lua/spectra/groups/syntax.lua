@@ -11,7 +11,7 @@ local M = {}
 function M.get(p, config)
   local groups = {
     -- Root syntax groups with direct palette mapping
-    Comment    = { fg = p["syntax.comment"], italic = true },
+    Comment    = { fg = p["syntax.comment"] },
     String     = { fg = p["syntax.string"] },
     Constant   = { fg = p["syntax.constant"] },
     Function   = { fg = p["syntax.function"] },

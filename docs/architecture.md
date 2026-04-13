@@ -244,7 +244,7 @@ spectra/
 | Type | syntax.type | StorageClass, Structure, Typedef |
 | Special | syntax.special | SpecialChar, Tag, Debug, SpecialComment |
 
-Statement 设有 `bold = true`，Comment 设有 `italic = true`。
+Statement 设有 `bold = true`，Comment 不附带额外字体样式。
 
 #### treesitter.lua（54 组）
 
