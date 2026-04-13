@@ -13,6 +13,8 @@ function M.get(p, config)
 
   local transparent = config.transparent == true
   local bg = not transparent and p.bg or nil
+  local search_bg = p["ui.search.bg"]
+  local search_fg = colors.is_dark(search_bg) and p.fg or p.bg
 
   return {
     -- L0: Root
@@ -26,7 +28,7 @@ function M.get(p, config)
     VisualNOS    = { link = "Visual" },
 
     -- L1: UI - Search
-    Search     = { fg = p.fg, bg = p["ui.search.bg"] },
+    Search     = { fg = search_fg, bg = search_bg },
     IncSearch  = { link = "Search" },
     CurSearch  = { link = "Search" },
     Substitute = { link = "Search" },

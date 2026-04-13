@@ -123,6 +123,10 @@ do
   local normal = vim.api.nvim_get_hl(0, { name = "Normal" })
   assert_true("Normal has fg+bg", normal.fg ~= nil and normal.bg ~= nil)
 
+  local search = vim.api.nvim_get_hl(0, { name = "Search" })
+  assert_true("Search has fg+bg", search.fg ~= nil and search.bg ~= nil)
+  assert_eq("Search fg uses dark text on bright search bg", hex(search.fg), "#1e1e1e")
+
   -- Syntax
   local comment = vim.api.nvim_get_hl(0, { name = "Comment" })
   assert_true("Comment has fg", comment.fg ~= nil)

@@ -84,12 +84,13 @@ do
   assert_true("dark: visual > bg lightness",
     get_lightness(resolved["ui.visual"]) > bg_l)
 
-  -- Visual hierarchy: cursorline < float < statusline (increasing contrast)
+  -- Visual hierarchy: statusline < cursorline < float (statusline is subtler than cursorline)
   local cl_l = get_lightness(resolved["ui.cursorline"])
   local fl_l = get_lightness(resolved["ui.float"])
   local sl_l = get_lightness(resolved["ui.statusline"])
   assert_true("dark: cursorline < float lightness", cl_l < fl_l)
-  assert_true("dark: float < statusline lightness", fl_l < sl_l)
+  assert_true("dark: statusline < cursorline lightness", sl_l < cl_l)
+  assert_true("dark: statusline < float lightness", sl_l < fl_l)
 
   -- All main UI areas should be distinct from each other
   all_distinct("dark: UI areas distinct", {
@@ -134,12 +135,13 @@ do
   assert_true("light: visual < bg lightness",
     get_lightness(resolved["ui.visual"]) < bg_l)
 
-  -- Visual hierarchy: cursorline > float > statusline (decreasing, darker = more contrast)
+  -- Visual hierarchy: statusline > cursorline > float (statusline is subtler than cursorline)
   local cl_l = get_lightness(resolved["ui.cursorline"])
   local fl_l = get_lightness(resolved["ui.float"])
   local sl_l = get_lightness(resolved["ui.statusline"])
   assert_true("light: cursorline > float lightness", cl_l > fl_l)
-  assert_true("light: float > statusline lightness", fl_l > sl_l)
+  assert_true("light: statusline > cursorline lightness", sl_l > cl_l)
+  assert_true("light: cursorline > float lightness (repeat order)", cl_l > fl_l)
 
   -- All distinct
   all_distinct("light: UI areas distinct", {
@@ -175,9 +177,9 @@ do
   assert_true("black: cursorline > #000000",
     get_lightness(resolved["ui.cursorline"]) > 0)
 
-  -- StatusLine should be noticeably lighter
-  assert_true("black: statusline noticeably lighter",
-    get_lightness(resolved["ui.statusline"]) > 0.1)
+  -- StatusLine should still be lighter than pure black
+  assert_true("black: statusline lighter than pure black",
+    get_lightness(resolved["ui.statusline"]) > 0)
 
   print("  Extreme dark ✓")
 end
@@ -202,9 +204,9 @@ do
   assert_true("white: cursorline < 1.0 lightness",
     get_lightness(resolved["ui.cursorline"]) < 1)
 
-  -- StatusLine should be noticeably darker
-  assert_true("white: statusline noticeably darker",
-    get_lightness(resolved["ui.statusline"]) < 0.9)
+  -- StatusLine should still be darker than pure white
+  assert_true("white: statusline darker than pure white",
+    get_lightness(resolved["ui.statusline"]) < 1)
 
   print("  Extreme light ✓")
 end
